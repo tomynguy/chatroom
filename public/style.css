@@ -2,56 +2,84 @@ body {
     background-color: rgb(36, 39, 43);
 }
 
-.center-top {
-    font: normal normal bold 250% 'Comic Sans MS', cursive;
-    color: white;
-    position: relative;
+div {
+    position: fixed;
+    left: 0%;
     text-align: center;
 }
 
-.center-bottom {
+input {
+    background-color: rgb(100, 100, 100);
     border: 4px solid rgb(50, 50, 50);
     border-radius: 10px;
-    height: 5%;
-    position: relative;
-    top: 93.5%;
-    right: -30%;
-    text-align: center;
-    inline-size: 35%;
-    background-color: rgb(100, 100, 100);
+    color: white;
+    font: normal normal bold 125% 'Comic Sans MS', cursive;
+    height: 4%;
+}
+
+::placeholder {
+    color: rgb(150, 150, 150);
+  }
+
+.center_top {
+    top: 10%;
+    width: 100%;
 }
 
 .center {
-    border: 4px solid rgb(50, 50, 50);
-    border-radius: 10px;
-    height: 5%;
-    position: relative;
-    top: 50%;
-    right: -38%;
-    text-align: center;
-    inline-size: 20%;
-    background-color: rgb(100, 100, 100);
+    top: 55%;
+    width: 95.5%;
 }
 
-.input {
+.center_bottom {
+    top: 90%;
+    width: 95.5%;
+}
+
+.chatbox {
+    top: 20px;
+    width: 100%;
+    Overflow-y: scroll;
+    max-height: 85%;
+}
+
+.chatbox::-webkit-scrollbar {
+    display: none;
+}
+
+.title {
     color: white;
-    padding: none;
-    width: 97.5%;
-    height: 75%;
-    transform: translateY(15%);
-    border: none;
-    font: normal normal bold 125% 'Comic Sans MS', cursive;
-    outline: none;
-    background-color: transparent;
+    font: normal normal bold 550% 'Comic Sans MS', cursive;
+}
+
+.username {
+    width: 25%;
+}
+
+.invalid {
+    color: red;
+    font: normal normal bold 75% 'Comic Sans MS', cursive;
+    margin: 0px;
+    position: relative;
+    transform: translate(-8.5%, 25%);
+    display: none;
+}
+
+.chat {
+    width: 40%;
 }
 
 .send {
-    border: 2px solid rgb(106, 90, 205);
-    float: right;
-    border-radius: 40px;
-    width: fit-content;
-    height: fit-content;
-    transform: translate(150%, -90%);
     background-color: rgb(116, 100, 215);
+    border: 3px solid rgb(106, 90, 205);
+    border-radius: 10px;
     color: white;
+    position: absolute;
+    transform: translate(40%, 30%);
+}
+
+.message {
+    color: white;
+    font: normal normal bold 100% 'Comic Sans MS', cursive;
+    margin: 0px;
 }
