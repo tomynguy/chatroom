@@ -4,7 +4,7 @@ const http = require('http').Server(app);
 const io =  require('socket.io')(http);
 const fs = require('fs');
 
-const [PORT, userPrefix, adminKey] = setConfig();
+const [PORT, userPrefix, adminKey, printSize] = setConfig();
 const invalidWords = getInvalidWords();
 let users = new Set();
 let admins = new Set();
@@ -37,8 +37,9 @@ io.on('connection', (socket) => {
 
     socket.on('messageSent', (user, message) => {
       if (stringFilter(message)) return;
-      const newMessage = user + ": " + message;
-      console.log(newMessage.substring(0, 150) + "...");
+      let newMessage = user + ": " + message;
+      if (newMessage.length > printSize) newMessage = newMessage.substring(0, 150) + "...";
+      console.log(newMessage);
       io.to("room").emit("messageRecieved", user, message);
     });
 
