@@ -52,14 +52,13 @@ input {
     font: normal normal bold 550% 'Comic Sans MS', cursive;
 }
 
-.username {
+.login {
     width: 25%;
 }
 
 .invalid {
     color: red;
     font: normal normal bold 75% 'Comic Sans MS', cursive;
-    margin: 0px;
     position: relative;
     bottom: 0px;
     display: none;
@@ -80,6 +79,7 @@ input {
 
 .message {
     color: white;
-    font: normal normal bold 100% 'Comic Sans MS', cursive;
-    margin: 0px;
+    font: normal normal normal 100% 'Comic Sans MS', cursive;
+    margin: auto;
+    max-width: 50%;
 }

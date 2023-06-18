@@ -1,10 +1,13 @@
 const socket = io();
 
-let usernameInput, usernameButton, title, center, center_top, chatInput, chatButton, center_bottom, user, chatbox;
+let usernameInput, usernameButton, title, center, center_top, chatInput, chatButton, center_bottom, user, chatbox, color;
 
 socket.on('getUser', (username) => {
+    // Set color
+    color = getColor(username);
+
     // Initialize all html elements
-    usernameInput = Object.assign(document.createElement('input'), {className: 'username', value: username, onfocus: function() { if (this.value === username) { this.value = ''; username = '';} }});
+    usernameInput = Object.assign(document.createElement('input'), {className: 'login', value: username, onfocus: function() { if (this.value === username) { this.value = ''; username = '';} }});
     usernameButton = Object.assign(document.createElement('button'), {className: 'send', textContent: 'Send'});
     usernameInvalid = Object.assign(document.createElement('label'), {className: 'invalid'});
     title = Object.assign(document.createElement('h1'), {className: 'title', textContent: '~Tuktopia~'});
@@ -63,9 +66,19 @@ socket.on('loginSuccess', (username) => {
     user = username;
 });
 
-socket.on('messageRecieved', (message) => {
-    let m = Object.assign(document.createElement('p'), {className: 'message', textContent: message});
-    chatbox.append(m);
-    console.log(message);
-    m.scrollIntoView();
+socket.on('messageRecieved', (author, message) => {
+    let authorElement = Object.assign(document.createElement('span'), {textContent: author});
+    let messageElement = Object.assign(document.createElement('p'), {className: 'message'});
+    authorElement.style.color = color;
+    messageElement.append(authorElement);
+    messageElement.append(": " + message);
+    chatbox.append(messageElement);
+    messageElement.scrollIntoView();
 });
+
+function getColor(username) {
+    let seed = 0;
+    for (let i = 0; i < username.length; i++) seed += username.charCodeAt(i);
+    seed %= 256;
+    return (seed,seed,seed);
+}

@@ -37,9 +37,9 @@ io.on('connection', (socket) => {
 
     socket.on('messageSent', (user, message) => {
       if (stringFilter(message)) return;
-      const newMessage = user + " : " + message;
-      console.log(newMessage)
-      io.to("room").emit("messageRecieved", newMessage);
+      const newMessage = user + ": " + message;
+      console.log(newMessage.substring(0, 150) + "...");
+      io.to("room").emit("messageRecieved", user, message);
     });
 
   });
