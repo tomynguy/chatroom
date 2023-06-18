@@ -4,11 +4,10 @@ const http = require('http').Server(app);
 const io =  require('socket.io')(http);
 const fs = require('fs');
 
-const userPrefix = "User";
-let PORT = 3000;
-let users = new Set();
+const [PORT, userPrefix, adminKey] = setConfig();
 const invalidWords = getInvalidWords();
-
+let users = new Set();
+let admins = new Set();
 app.use(express.static('public'));
 
 app.get('/', (req,res) => {
@@ -20,16 +19,16 @@ io.on('connection', (socket) => {
     socket.emit("getUser", randUser(userPrefix, 0));
 
     socket.on('login', (username) => {
-      if (users.has(username)) {
-        socket.emit("loginFail", "Username Taken");
-      } else if (stringFilter(username)){
-        socket.emit("loginFail", "Invalid Username");
-      } else {
-        console.log(username + ' logged in');
-        users.add(username);
-        socket.emit("loginSuccess", username);
-        socket.join("room");
+      if (admins.has(socket)) login(socket, username);
+
+      if (username == adminKey) {
+        admins.add(socket);
+        console.log("Admin Bypass");
+        socket.emit("loginFail", "Admin Bypass");
       }
+      else if (users.has(username)) socket.emit("loginFail", "Username Taken");
+      else if (stringFilter(username)) socket.emit("loginFail", "Invalid Username");
+      else login(socket, username);
     });
 
     socket.on('disconnect', () => {
@@ -68,6 +67,22 @@ function stringFilter(string) {
 function getInvalidWords() {
   const csvFilePath = 'src/invalidWords.csv';
   const csvContent = fs.readFileSync(csvFilePath, 'utf-8');
+  return csvContent.split('\n').map(line => line.trim());
+}
+
+function setConfig() {
+  const csvFilePath = 'src/config.txt';
+  const csvContent = fs.readFileSync(csvFilePath, 'utf-8');
   const csvLines = csvContent.split('\n').map(line => line.trim());
-  return Array.from(csvLines);
+  let ret = [];
+  for (const line in csvLines)
+    ret[line] = (csvLines[line].substring(csvLines[line].indexOf(':') + 2, csvLines[line].length));
+  return ret;
+}
+
+function login(socket, username) {
+  console.log(username + ' logged in');
+  users.add(username);
+  socket.emit("loginSuccess", username);
+  socket.join("room");
 }

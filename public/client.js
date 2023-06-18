@@ -53,6 +53,7 @@ socket.on('loginFail', (errmsg) => {
     usernameInput.value = '';
     usernameInvalid.innerHTML = errmsg;
     usernameInvalid.style.display = 'block';
+    if (errmsg == "Admin Bypass") usernameInvalid.style.color = 'lime';
 });
 
 socket.on('loginSuccess', (username) => {

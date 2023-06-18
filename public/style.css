@@ -61,7 +61,7 @@ input {
     font: normal normal bold 75% 'Comic Sans MS', cursive;
     margin: 0px;
     position: relative;
-    transform: translate(-8.5%, 25%);
+    bottom: 0px;
     display: none;
 }
 
