@@ -80,12 +80,12 @@ socket.on('messageRecieved', (author, message) => {
 });
 
 function genColor(username) {
-    let seed = [100,100,100];
+    let seed = [100,0,100];
     for (let i = 0; i < username.length; i++) {
-        seed[i % 3] += username.charCodeAt(i);
+        seed[i % 3] += username.charCodeAt(i) * i;
     }
     seed = seed.map(element => {
-        return element = (element % 3 == 0) ? 0 : (element * 2) % 256;
+        return element = (element % 3 == 0) ? 0 : (element * 2) % 250 + 50;
     });
     return `rgb(${seed[0]}, ${seed[1]}, ${seed[2]})`;
 }

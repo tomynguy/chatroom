@@ -47,10 +47,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('messageSent', (user, message) => {
-      if (stringFilter(message)) return;
-      let messageLength = message.replace(/[\n\r\s]/g, "").length;
-      if (messageLength < minMessageLength) return;
-      if (messageLength > maxMessageLength) message = message.substring(0, maxMessageLength) + '...';
+      if (!admins.has(socket)) {
+        if (stringFilter(message)) return;
+        let messageLength = message.replace(/[\n\r\s]/g, "").length;
+        if (messageLength < minMessageLength) return;
+        if (messageLength > maxMessageLength) message = message.substring(0, maxMessageLength) + '...';
+      }
       consolePrint(user + ': ' + message);
       io.to('room').emit('messageRecieved', user, message);
     });
