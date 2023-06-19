@@ -81,6 +81,7 @@ function getColor(username) {
     }
     let sum = 0;
     seed = seed.map(element => {
+        element = (element % 5 == 0) ? 0 : element * 2;
         sum += element %= 256;
         return element;
     });
