@@ -4,9 +4,10 @@ const http = require('http').Server(app);
 const io =  require('socket.io')(http);
 const fs = require('fs');
 
-const [PORT, userPrefix, adminKey, printSize] = setConfig();
+const [PORT, userPrefix, adminKey, printSize, username_retry] = setConfig();
 const invalidWords = getInvalidWords();
 let users = new Set();
+let socket_to_user = new Map();
 let admins = new Set();
 app.use(express.static('public'));
 
@@ -15,32 +16,38 @@ app.get('/', (req,res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('A user connected');
-    socket.emit("getUser", randUser(userPrefix, 0));
+    console.log('Client connected');
+    socket.emit('getUser', randUser(userPrefix, 0));
 
     socket.on('login', (username) => {
       if (admins.has(socket)) login(socket, username);
 
       if (username == adminKey) {
         admins.add(socket);
-        console.log("Admin Bypass");
-        socket.emit("loginFail", "Admin Bypass");
+        console.log('Admin Bypass');
+        socket.emit('loginFail', 'Admin Bypass');
       }
-      else if (users.has(username)) socket.emit("loginFail", "Username Taken");
-      else if (stringFilter(username)) socket.emit("loginFail", "Invalid Username");
+      else if (users.has(username)) socket.emit('loginFail', 'Username Taken');
+      else if (stringFilter(username)) socket.emit('loginFail', 'Invalid Username');
       else login(socket, username);
     });
 
     socket.on('disconnect', () => {
-      console.log('A user disconnected');
+      if (socket_to_user.has(socket)) {
+        let user = socket_to_user.get(socket);
+        console.log(user + ' disconnected');
+        users.delete(user);
+      }
+      else console.log('Client disconnected');
     });
 
     socket.on('messageSent', (user, message) => {
-      if (stringFilter(message)) return;
-      let newMessage = user + ": " + message;
-      if (newMessage.length > printSize) newMessage = newMessage.substring(0, 150) + "...";
-      console.log(newMessage);
-      io.to("room").emit("messageRecieved", user, message);
+      if (stringFilter(message)) {
+        consolePrint(user + ' sent restricted message: ' + message);
+        return;
+      }
+      consolePrint(user + ': ' + message);
+      io.to('room').emit('messageRecieved', user, message);
     });
 
   });
@@ -51,17 +58,15 @@ http.listen(PORT, () => {
 
 // Find a unique random name. If random name isn't found after 5 tries, append another digit.
 function randUser(username, recurse) {
-  for (let i = 0; i < (5 + recurse/5); i++) username += Math.floor(Math.random() * 10);
+  for (let i = 0; i < (5 + recurse / username_retry); i++) username += Math.floor(Math.random() * 10);
   if (users.has(username)) return randUser(userPrefix, recurse + 1);
   return username;
 }
 
 // Filters out naughty words...
 function stringFilter(string) {
-  let filtered_string = string.replace(/[^a-zA-Z0-9]/g, '');
-  for (const word in invalidWords) {
-    if (filtered_string.includes(invalidWords[word])) return true;
-  }
+  let filtered_string = string.replace(/[^a-zA-Z]/g, '').toLowerCase();
+  for (const word in invalidWords) if (filtered_string.includes(invalidWords[word])) return true;
   return string.replace(/\s+/g, '').length == 0;
 }
 
@@ -82,8 +87,14 @@ function setConfig() {
 }
 
 function login(socket, username) {
-  console.log(username + ' logged in');
+  consolePrint(username + ' logged in');
+  socket_to_user.set(socket, username);
   users.add(username);
-  socket.emit("loginSuccess", username);
-  socket.join("room");
+  socket.emit('loginSuccess', username);
+  socket.join('room');
+}
+
+function consolePrint(string) {
+  if (string.length > printSize) string = string.substring(0, printSize) + '...';
+  console.log(string);
 }

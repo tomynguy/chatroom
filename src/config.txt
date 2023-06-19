@@ -2,3 +2,4 @@ Port: 3000
 User-Prefix: User
 Admin-Key: password
 Print-Size: 150
+Username-Retry: 5

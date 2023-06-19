@@ -48,7 +48,7 @@ function login() {
 }
 
 function messageSend() {
-    socket.emit("messageSent", user, chatInput.value);
+    socket.emit('messageSent', user, chatInput.value);
     chatInput.value = '';
 }
 
@@ -56,7 +56,7 @@ socket.on('loginFail', (errmsg) => {
     usernameInput.value = '';
     usernameInvalid.innerHTML = errmsg;
     usernameInvalid.style.display = 'block';
-    if (errmsg == "Admin Bypass") usernameInvalid.style.color = 'lime';
+    if (errmsg == 'Admin Bypass') usernameInvalid.style.color = 'lime';
 });
 
 socket.on('loginSuccess', (username) => {
@@ -71,7 +71,7 @@ socket.on('messageRecieved', (author, message) => {
     let messageElement = Object.assign(document.createElement('p'), {className: 'message'});
     authorElement.style.color = color;
     messageElement.append(authorElement);
-    messageElement.append(": " + message);
+    messageElement.append(': ' + message);
     chatbox.append(messageElement);
     messageElement.scrollIntoView();
 });
