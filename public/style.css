@@ -41,6 +41,7 @@ input {
     width: 100%;
     Overflow-y: scroll;
     max-height: 85%;
+    text-align: left;
 }
 
 .chatbox::-webkit-scrollbar {
@@ -77,9 +78,18 @@ input {
     transform: translate(40%, 30%);
 }
 
+.author {
+    font: normal normal normal 110% 'Comic Sans MS', cursive;
+    margin-top: 0%;
+    margin-left: 29%;
+    margin-right: 31%;
+}
+
 .message {
     color: white;
     font: normal normal normal 100% 'Comic Sans MS', cursive;
-    margin: auto;
-    max-width: 50%;
+    margin-top: 0%;
+    margin-left: 30%;
+    margin-right: 30%;
+    word-wrap: break-word;
 }

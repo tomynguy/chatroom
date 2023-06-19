@@ -1,10 +1,9 @@
 const socket = io();
 
-let usernameInput, usernameButton, title, center, center_top, chatInput, chatButton, center_bottom, user, chatbox, color;
+let usernameInput, usernameButton, title, center, center_top, chatInput, chatButton, center_bottom, user, chatbox;
+let color = (255,255,255);
 
 socket.on('getUser', (username) => {
-    // Set color
-    color = getColor(username);
 
     // Initialize all html elements
     usernameInput = Object.assign(document.createElement('input'), {className: 'login', value: username, onfocus: function() { if (this.value === username) { this.value = ''; username = '';} }});
@@ -64,21 +63,26 @@ socket.on('loginSuccess', (username) => {
     center_top.remove();
     document.body.append(center_bottom, chatbox);
     user = username;
+    color = getColor(username);
 });
 
 socket.on('messageRecieved', (author, message) => {
-    let authorElement = Object.assign(document.createElement('span'), {textContent: author});
-    let messageElement = Object.assign(document.createElement('p'), {className: 'message'});
+    let authorElement = Object.assign(document.createElement('span'), {textContent: author, className: 'author'});
+    let messageElement = Object.assign(document.createElement('p'), {className: 'message', textContent: message});
     authorElement.style.color = color;
-    messageElement.append(authorElement);
-    messageElement.append(': ' + message);
-    chatbox.append(messageElement);
+    chatbox.append(authorElement, messageElement);
     messageElement.scrollIntoView();
 });
 
 function getColor(username) {
-    let seed = 0;
-    for (let i = 0; i < username.length; i++) seed += username.charCodeAt(i);
-    seed %= 256;
-    return (seed,seed,seed);
+    let seed = [0,0,0];
+    for (let i = 0; i < username.length; i++) {
+        seed[i % 3] += username.charCodeAt(i);
+    }
+    let sum = 0;
+    seed = seed.map(element => {
+        sum += element %= 256;
+        return element;
+    });
+    return `rgb(${seed[sum % 3]}, ${seed[++sum % 3]}, ${seed[++sum % 3]})`;
 }

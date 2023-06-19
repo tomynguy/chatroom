@@ -4,7 +4,7 @@ const http = require('http').Server(app);
 const io =  require('socket.io')(http);
 const fs = require('fs');
 
-const [PORT, userPrefix, adminKey, printSize, username_retry] = setConfig();
+const [PORT, userPrefix, adminKey, printSize, username_retry, maxUserLength, minUserLength] = setConfig();
 const invalidWords = getInvalidWords();
 let users = new Set();
 let socket_to_user = new Map();
@@ -21,15 +21,19 @@ io.on('connection', (socket) => {
 
     socket.on('login', (username) => {
       if (admins.has(socket)) login(socket, username);
-
-      if (username == adminKey) {
-        admins.add(socket);
-        console.log('Admin Bypass');
-        socket.emit('loginFail', 'Admin Bypass');
+      else {
+        username = username.replace(/(\r\n|\n|\r)/gm, "");
+        if (username == adminKey) {
+          admins.add(socket);
+          console.log('Admin Bypass');
+          socket.emit('loginFail', 'Admin Bypass');
+        }
+        else if (users.has(username)) socket.emit('loginFail', 'Username Taken');
+        else if (stringFilter(username)) socket.emit('loginFail', 'Invalid Username');
+        else if (username.length > maxUserLength) socket.emit('loginFail', 'Name cannot exceed ' + maxUserLength + ' characters')
+        else if (username.replace(/\s+/g, '').length < minUserLength) socket.emit('loginFail', 'Name must be at least ' + minUserLength + ' characters')
+        else login(socket, username);
       }
-      else if (users.has(username)) socket.emit('loginFail', 'Username Taken');
-      else if (stringFilter(username)) socket.emit('loginFail', 'Invalid Username');
-      else login(socket, username);
     });
 
     socket.on('disconnect', () => {
@@ -67,15 +71,18 @@ function randUser(username, recurse) {
 function stringFilter(string) {
   let filtered_string = string.replace(/[^a-zA-Z]/g, '').toLowerCase();
   for (const word in invalidWords) if (filtered_string.includes(invalidWords[word])) return true;
-  return string.replace(/\s+/g, '').length == 0;
+  return false;
 }
 
+
+// Retrieves an array of invalid words from invalidWords.csv
 function getInvalidWords() {
   const csvFilePath = 'src/invalidWords.csv';
   const csvContent = fs.readFileSync(csvFilePath, 'utf-8');
   return csvContent.split('\n').map(line => line.trim());
 }
 
+// Gets array from a parsed config.txt
 function setConfig() {
   const csvFilePath = 'src/config.txt';
   const csvContent = fs.readFileSync(csvFilePath, 'utf-8');
@@ -86,6 +93,7 @@ function setConfig() {
   return ret;
 }
 
+// Handles user login
 function login(socket, username) {
   consolePrint(username + ' logged in');
   socket_to_user.set(socket, username);
@@ -94,6 +102,7 @@ function login(socket, username) {
   socket.join('room');
 }
 
+// Handles extrenous prints to server-console
 function consolePrint(string) {
   if (string.length > printSize) string = string.substring(0, printSize) + '...';
   console.log(string);

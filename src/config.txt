@@ -3,3 +3,5 @@ User-Prefix: User
 Admin-Key: password
 Print-Size: 150
 Username-Retry: 5
+Max-Username-Length: 50
+Min-Username-Length: 3
