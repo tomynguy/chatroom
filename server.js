@@ -4,7 +4,8 @@ const http = require('http').Server(app);
 const io =  require('socket.io')(http);
 const fs = require('fs');
 
-const [PORT, userPrefix, adminKey, printSize, username_retry, maxUserLength, minUserLength] = setConfig();
+const [PORT, userPrefix, adminKey, printSize, username_retry, maxUserLength, 
+       minUserLength, maxMessageLength, minMessageLength] = setConfig();
 const invalidWords = getInvalidWords();
 let users = new Set();
 let socket_to_user = new Map();
@@ -46,10 +47,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('messageSent', (user, message) => {
-      if (stringFilter(message)) {
-        consolePrint(user + ' sent restricted message: ' + message);
-        return;
-      }
+      if (stringFilter(message)) return;
+      let messageLength = message.replace(/[\n\r\s]/g, "").length;
+      if (messageLength < minMessageLength) return;
+      if (messageLength > maxMessageLength) message = message.substring(0, maxMessageLength) + '...';
       consolePrint(user + ': ' + message);
       io.to('room').emit('messageRecieved', user, message);
     });

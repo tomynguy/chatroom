@@ -5,3 +5,5 @@ Print-Size: 150
 Username-Retry: 5
 Max-Username-Length: 50
 Min-Username-Length: 3
+Max-Message-Length: 500
+Min-Message-Length: 1

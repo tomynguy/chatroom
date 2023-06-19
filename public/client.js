@@ -1,6 +1,7 @@
 const socket = io();
 
 let usernameInput, usernameButton, title, center, center_top, chatInput, chatButton, center_bottom, user, chatbox;
+let userColors = new Map();
 
 socket.on('getUser', (username) => {
 
@@ -26,7 +27,7 @@ socket.on('getUser', (username) => {
     document.body.append(center, center_top);
     usernameButton.onclick = login;
 
-    usernameInput.style.color = getColor(username);
+    usernameInput.style.color = genColor(username);
 
     usernameInput.addEventListener('keydown', function(event) {
         if (event.key == 'Enter' && !event.repeat) {
@@ -34,7 +35,7 @@ socket.on('getUser', (username) => {
             usernameButton.click();
         } else {
             console.log("balls");
-            usernameInput.style.color = getColor(usernameInput.value);
+            usernameInput.style.color = genColor(usernameInput.value);
         }
     });
 
@@ -73,12 +74,12 @@ socket.on('loginSuccess', (username) => {
 socket.on('messageRecieved', (author, message) => {
     let authorElement = Object.assign(document.createElement('span'), {textContent: author, className: 'author'});
     let messageElement = Object.assign(document.createElement('p'), {className: 'message', textContent: message});
-    authorElement.style.color = usernameInput.style.color;
+    authorElement.style.color = getUserColor(author);
     chatbox.append(authorElement, messageElement);
     messageElement.scrollIntoView();
 });
 
-function getColor(username) {
+function genColor(username) {
     let seed = [100,100,100];
     for (let i = 0; i < username.length; i++) {
         seed[i % 3] += username.charCodeAt(i);
@@ -86,6 +87,12 @@ function getColor(username) {
     seed = seed.map(element => {
         return element = (element % 3 == 0) ? 0 : (element * 2) % 256;
     });
-    console.log(seed);
     return `rgb(${seed[0]}, ${seed[1]}, ${seed[2]})`;
+}
+
+function getUserColor(username) {
+    if (userColors.has(username)) return userColors.get(username);
+    let userColor = genColor(username);
+    userColors.set(username, userColor);
+    return userColor;
 }
