@@ -34,7 +34,6 @@ socket.on('getUser', (username) => {
             event.preventDefault();
             usernameButton.click();
         } else {
-            console.log("balls");
             usernameInput.style.color = genColor(usernameInput.value);
         }
     });
@@ -100,3 +99,7 @@ function getUserColor(username) {
     userColors.set(username, userColor);
     return userColor;
 }
+
+socket.on('reload', () => {
+    location.reload();
+  });
