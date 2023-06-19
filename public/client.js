@@ -2,7 +2,7 @@ const socket = io();
 
 let usernameInput, usernameButton, title, center, center_top, chatInput, chatButton, center_bottom, user, chatbox;
 let userColors = new Map();
-
+let recent_author = null;
 socket.on('getUser', (username) => {
 
     // Initialize all html elements
@@ -72,11 +72,15 @@ socket.on('loginSuccess', (username) => {
 });
 
 socket.on('messageRecieved', (author, message) => {
-    let authorElement = Object.assign(document.createElement('span'), {textContent: author, className: 'author'});
-    let messageElement = Object.assign(document.createElement('p'), {className: 'message', textContent: message});
-    authorElement.style.color = getUserColor(author);
-    chatbox.append(authorElement, messageElement);
+    let messageElement = Object.assign(document.createElement('p'), {className: 'message', textContent: message});;
+    if (author !== recent_author) {
+        let authorElement = Object.assign(document.createElement('p'), {textContent: author, className: 'author'});
+        authorElement.style.color = getUserColor(author);
+        chatbox.append(authorElement);
+    }
+    chatbox.append(messageElement);
     messageElement.scrollIntoView();
+    recent_author = author;
 });
 
 function genColor(username) {

@@ -80,7 +80,8 @@ input {
 
 .author {
     font: normal normal normal 110% 'Comic Sans MS', cursive;
-    margin-top: 0%;
+    margin-top: 10px;
+    margin-bottom: 0%;
     margin-left: 29%;
     margin-right: 31%;
 }
@@ -89,6 +90,7 @@ input {
     color: white;
     font: normal normal normal 100% 'Comic Sans MS', cursive;
     margin-top: 0%;
+    margin-bottom: 0%;
     margin-left: 30%;
     margin-right: 30%;
     word-wrap: break-word;
